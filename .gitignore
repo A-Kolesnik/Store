@@ -1,0 +1,7 @@
+orders/migrations
+products/migrations
+users/migrations
+products/fixtures
+**/__pycache__
+media/users/images/*
+db.sqlite3

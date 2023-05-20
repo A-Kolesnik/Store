@@ -1,0 +1,39 @@
+{% extends 'products/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}{{ title }}{% endblock %}
+{% block t_style %}<link href="{% static 'vendor/css/orders.css' %}" rel="stylesheet">{% endblock %}
+{% block content %}
+<section>
+    <div class="container pt-5">
+        <div class="text-center mt-5">
+            <h1>Заказ № {{ order.id }}</h1>
+            <div class="orders mt-5">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Название</th>
+                        <th scope="col">Кол-во</th>
+                        <th scope="col">Цена</th>
+                        <th scope="col">Сумма</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for buscet in order.buscets %}
+                            <tr>
+                                <th scope="row">
+                                    {{ buscet.product__name }}
+                                </th>
+                                <td>{{ buscet.total }}</td>
+                                <td>{{ buscet.product__price|intcomma }} руб.</td>
+                                <td>{{ buscet.price|intcomma }} руб.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="float-right h4 mt-3">Итого {{ order.to_pay|intcomma }} руб.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

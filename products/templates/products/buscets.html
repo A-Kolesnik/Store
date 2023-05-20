@@ -1,0 +1,43 @@
+{% load humanize %}
+{% if buscets %}
+<div class="col-lg-5">
+    <h4 class="mt-5 mb-5 d-flex justify-content-between align-items-center mb-5">
+        Корзина <span class="badge badge-secondary badge-pill">{{ buscets.calc_total_products }}</span>
+    </h4>
+    {% for buscet in buscets %}
+        <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ buscet.product__name }}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item bg-light">
+                <div class="row text-center">
+                    <div class="col-lg-4">
+                        <input name="basketID" type="number" class="form-control"
+                               value="{{ buscet.total }}" min="0">
+                    </div>
+                    <div class="col-lg-4">{{ buscet.price|intcomma }} руб.</div>
+                    <div class="col-lg-4">
+                        <a href="{% url 'ns_products:remove_product' buscet.id %}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    {% endfor %}
+
+    <div class="card mb-3">
+        <div class="card-footer">
+            <p class="float-left">Итого</p>
+            <h4 class="float-right">{{ buscets.calc_total_price|intcomma }} руб.</h4>
+        </div>
+    </div>
+    <a class="btn btn-success btn-lg float-right" href="{% url 'orders:create' %}">
+        Оформить заказ
+    </a>
+</div>
+{% else %}
+<h4 class="mt-5 mb-5 text-center">Корзина пуста</h4>
+{% endif %}
