@@ -4,10 +4,12 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
+from rest_framework.generics import ListAPIView
 
 from common.views import CommonMixin
 
 from .models import Buscet, Product, ProductCategory
+from .serializers import ProductSerializer
 
 
 class IndexView(CommonMixin, TemplateView):
@@ -63,6 +65,20 @@ class ProductListView(CommonMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = ProductCategory.objects.all()
         return context
+
+
+class APIProductsListView(ListAPIView):
+
+    """Возвращает ресурс-перечень товаров
+
+    Переопределены атрибуты:
+        1. queryset - набор записей
+        2. serializer_class - ссылка на класс-сериализатор
+
+    """
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
 @login_required

@@ -3,5 +3,6 @@ products/migrations
 users/migrations
 products/fixtures
 **/__pycache__
+.idea
 media/users/images/*
 db.sqlite3
