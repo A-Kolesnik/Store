@@ -81,6 +81,40 @@ class APIProductsListView(ListAPIView):
     serializer_class = ProductSerializer
 
 
+class APIProductsByCategory(ListAPIView):
+
+    """Возвращает ресурс-перечень товаров запрашиваемой по id категории
+
+     Переопределены атрибуты:
+         1. serializer_class - ссылка на класс-сериализатор
+     Переопределены методы:
+         1. get_queryset()
+     """
+
+    serializer_class = ProductSerializer
+    lookup_category_id = 'categoryID'
+
+    def get_queryset(self):
+        """Извлекает и возвращает товары запрашиваемой категории
+
+        Категория передается в URL-параметре 'categoryID' в виде ее primary_key 'id'
+
+        """
+        queryset = Product.objects.select_related(
+            'category'
+        ).filter(
+            category__id=self.kwargs[self.lookup_category_id]
+        ).values(
+            'name',
+            'description',
+            'price',
+            'quantity',
+        )
+        Product.objects.select_related(None)
+
+        return queryset
+
+
 @login_required
 def add_product(request: HttpRequest, product_id: int):
     """Добавляет товар в корзину пользователя и возвращает текущую страницу
