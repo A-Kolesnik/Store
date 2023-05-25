@@ -109,6 +109,6 @@ class OrderView(DetailView):
     """
 
     model = Orders
-    pk_url_kwarg = 'order_id'
+    pk_url_kwarg = 'orderID'
     template_name = 'orders/order.html'
     context_object_name = 'order'
