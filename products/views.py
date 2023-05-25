@@ -53,7 +53,7 @@ class ProductListView(CommonMixin, ListView):
         Если указана категория, которая не существует или не имеющая товаров, будет возвращена 404
 
         """
-        category_id = self.kwargs.get('category_id')
+        category_id = self.kwargs.get('categoryID')
         queryset = get_list_or_404(
             klass=self.model,
             category_id=category_id
