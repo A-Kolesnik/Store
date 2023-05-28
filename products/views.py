@@ -4,12 +4,12 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 
 from common.views import CommonMixin
 
 from .models import Buscet, Product, ProductCategory
-from .serializers import ProductSerializer
+from .serializers import ProductCategorySerializer, ProductSerializer
 
 
 class IndexView(CommonMixin, TemplateView):
@@ -113,6 +113,18 @@ class APIProductsByCategory(ListAPIView):
         Product.objects.select_related(None)
 
         return queryset
+
+
+class APIProductCategoryAddView(CreateAPIView):
+
+    """Создает ресурс-категория товара
+
+    Переопределены атрибуты:
+        1. serializer_class - ссылка на класс сериализатора
+
+    """
+
+    serializer_class = ProductCategorySerializer
 
 
 @login_required
