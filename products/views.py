@@ -81,7 +81,7 @@ class APIProductsListView(ListAPIView):
     serializer_class = ProductSerializer
 
 
-class APIProductsByCategory(ListAPIView):
+class APIProductsByCategoryView(ListAPIView):
 
     """Возвращает ресурс-перечень товаров запрашиваемой по id категории
 
