@@ -1,6 +1,7 @@
 from django.test import TestCase
-from products.models import Product, ProductCategory
+
 from common.mixins.test_mixins import TestVerboseNameMixin
+from products.models import Product, ProductCategory
 
 
 class ProductTests(TestCase, TestVerboseNameMixin):
