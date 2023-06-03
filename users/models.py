@@ -19,12 +19,6 @@ class User(AbstractUser):
     image = models.ImageField('Изображение', upload_to='users/images', null=True, blank=True)
     is_verified = models.BooleanField('Подтвержден', default=False)
 
-    def save(self, *args, **kwargs):
-        """Удаляет фото пользователя и вызывает метод save() суперкласса"""
-        last_user_info = User.objects.get(pk=self.pk)
-        last_user_info.image.delete(save=False)
-        super(User, self).save()
-
 
 class UserConfirmation(models.Model):
 
