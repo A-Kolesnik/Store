@@ -10,14 +10,16 @@ class ModelFieldParamsMixin(object):
     def research_equal_parameter_value(self, record, pairs_field_parameter_value, parameter_name):
         """Выполняет контроль равенства значения параметра поля модели с ожидаемым значением"""
         for field_name, expected_parameter_value in pairs_field_parameter_value.items():
-            field_value = record._meta.get_field(field_name)
-            real_parameter_value = getattr(field_value, parameter_name)
-            self.assertEqual(
-                expected_parameter_value,
-                real_parameter_value,
-                f'Неожиданное значение параметра {parameter_name} поля {field_name}\n'
-                f'Ожидаемое значение: {expected_parameter_value}\n'
-                f'Полученное значение: {real_parameter_value}\n')
+            with self.subTest(msg=f'{field_name=}'):
+                field_value = record._meta.get_field(field_name)
+                real_parameter_value = getattr(field_value, parameter_name)
+                self.assertEqual(
+                    expected_parameter_value,
+                    real_parameter_value,
+                    f'Неожиданное значение параметра {parameter_name} поля {field_name}\n'
+                    f'Ожидаемое значение: {expected_parameter_value}\n'
+                    f'Полученное значение: {real_parameter_value}\n'
+                )
 
 
 class TestVerboseNameMixin(ModelFieldParamsMixin):
