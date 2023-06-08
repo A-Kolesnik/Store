@@ -1,3 +1,6 @@
+from http import HTTPStatus
+
+
 class ModelFieldParamsMixin(object):
 
     """Миксин для исследования значений параметра всех полей модели
@@ -42,3 +45,27 @@ class TestVerboseNameMixin(ModelFieldParamsMixin):
             pairs_field_parameter_value,
             'verbose_name'
         )
+
+
+class TestViewsMixin(object):
+
+    """Миксин предоставляет различные методы тестирования контроллеров
+
+    Методы:
+        1. run_test_response_code()
+        2. run_test_template_name()
+        3. run_test_title()
+
+    """
+
+    def run_test_response_code(self):
+        """Запускает тестирование кода ответа на запрос"""
+        self.assertEqual(self.response.status_code, HTTPStatus.OK)
+
+    def run_test_template_name(self):
+        """Запускает тестирование имени шаблона, используемого для рендеринга"""
+        self.assertTemplateUsed(self.response, self.template_name)
+
+    def run_test_title(self):
+        """Запускает тестирование имени заголовка"""
+        self.assertEqual(self.response.context_data[self.title_key], self.title_data)
