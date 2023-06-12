@@ -10,7 +10,7 @@ class IndexViewTestCase(TestCase, TestViewsMixin):
 
     Переопределены методы родительского класса:
         1. setUpTestData()
-        2. setUp
+        2. setUp()
     Методы-тесты:
         1. test_return_code()
         2. test_template_name()

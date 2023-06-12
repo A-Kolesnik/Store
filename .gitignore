@@ -1,6 +1,4 @@
-orders/migrations
-products/migrations
-users/migrations
+**/migrations/00*.py
 **/__pycache__
 .idea
 media/users/images/*
