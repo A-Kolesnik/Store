@@ -176,6 +176,8 @@ EMAIL_USE_LOCALTIME = False
 
 DOMAIN_NAME = 'http://localhost:8000/'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 if DEBUG:
     import mimetypes
     mimetypes.add_type("application/javascript", ".js", True)
