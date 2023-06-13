@@ -54,10 +54,7 @@ class ProductListView(CommonMixin, ListView):
 
         """
         category_id = self.kwargs.get('categoryID')
-        queryset = get_list_or_404(
-            klass=self.model,
-            category_id=category_id
-        ) if category_id else self.model.objects.all()
+        queryset = self.model.objects.filter(category_id=category_id) if category_id else self.model.objects.all()
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
