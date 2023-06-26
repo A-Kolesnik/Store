@@ -27,7 +27,7 @@ urlpatterns = [
     path('products/', include('products.urls', namespace='ns_products')),
     path('users/', include('users.urls', namespace='users')),
     path('orders/', include('orders.urls', namespace='orders')),
-    path('api/', include('common.api_urls'))
+    path('api/', include('common.api_urls')),
 ]
 
 if settings.DEBUG:

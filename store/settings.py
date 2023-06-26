@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'orders',
     'debug_toolbar',
     'django_cleanup',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -79,6 +80,10 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 WSGI_APPLICATION = 'store.wsgi.application'
 
