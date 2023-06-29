@@ -74,7 +74,7 @@ class ProductListView(CommonMixin, ListView):
         description=' '
     ),
     retrieve=extend_schema(
-        operation_id='api_products_list',
+        operation_id='api_products_by_category_list',
         summary='Получить список товаров категории c ключом id',
         description=' '
     )
