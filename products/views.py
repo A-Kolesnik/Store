@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest, HttpResponseRedirect
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from common.views import CommonMixin
 
@@ -64,9 +66,22 @@ class ProductListView(CommonMixin, ListView):
         return context
 
 
-class APIProductsListView(ListAPIView):
+@extend_schema(tags=['Products'])
+@extend_schema_view(
+    list=extend_schema(
+        operation_id='api_products_list',
+        summary='Получить список товаров',
+        description=' '
+    ),
+    retrieve=extend_schema(
+        operation_id='api_products_list',
+        summary='Получить список товаров категории c ключом id',
+        description=' '
+    )
+)
+class ApiProductsViewSet(ReadOnlyModelViewSet):
 
-    """Возвращает ресурс-перечень товаров
+    """Возвращает ресурс-перечень товаров или ресурс-перечень товаров отдельной категории
 
     Переопределены атрибуты:
         1. queryset - набор записей
@@ -78,40 +93,13 @@ class APIProductsListView(ListAPIView):
     serializer_class = ProductSerializer
 
 
-class APIProductsByCategoryView(ListAPIView):
-
-    """Возвращает ресурс-перечень товаров запрашиваемой по id категории
-
-     Переопределены атрибуты:
-         1. serializer_class - ссылка на класс-сериализатор
-     Переопределены методы:
-         1. get_queryset()
-     """
-
-    serializer_class = ProductSerializer
-    lookup_category_id = 'categoryID'
-
-    def get_queryset(self):
-        """Извлекает и возвращает товары запрашиваемой категории
-
-        Категория передается в URL-параметре 'categoryID' в виде ее primary_key 'id'
-
-        """
-        queryset = Product.objects.select_related(
-            'category'
-        ).filter(
-            category__id=self.kwargs[self.lookup_category_id]
-        ).values(
-            'name',
-            'description',
-            'price',
-            'quantity',
-        )
-        Product.objects.select_related(None)
-
-        return queryset
-
-
+@extend_schema(tags=['Product Categories'])
+@extend_schema_view(
+    post=extend_schema(
+        summary='Добавить категорию товара',
+        description=' '
+    )
+)
 class APIProductCategoryAddView(CreateAPIView):
 
     """Создает ресурс-категория товара
