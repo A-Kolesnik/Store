@@ -4,7 +4,6 @@ from .models import Product, ProductCategory
 
 
 class ProductSerializer(serializers.ModelSerializer):
-
     """Выполняет преобразование набора записей 'товары' к формату json"""
 
     class Meta:
@@ -18,7 +17,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
-
     """Выполняет преобразование набора записей 'категории товаров' к формату json"""
 
     class Meta:
@@ -27,3 +25,13 @@ class ProductCategorySerializer(serializers.ModelSerializer):
             'name',
             'description',
         )
+
+
+class DetailMessageSerializer(serializers.Serializer):
+    detail = serializers.CharField()
+
+    def update(self, instance, validated_data):
+        self.update(instance, validated_data)
+
+    def create(self, validated_data):
+        self.create(validated_data)

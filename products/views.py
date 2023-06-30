@@ -5,13 +5,15 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 
 from common.views import CommonMixin
 
 from .models import Buscet, Product, ProductCategory
-from .serializers import ProductCategorySerializer, ProductSerializer
+from .serializers import ProductCategorySerializer, ProductSerializer, DetailMessageSerializer
 
 
 class IndexView(CommonMixin, TemplateView):
@@ -71,13 +73,23 @@ class ProductListView(CommonMixin, ListView):
     list=extend_schema(
         operation_id='api_products_list',
         summary='Получить список товаров',
-        description=' '
+        description=' ',
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductSerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+        }
     ),
     retrieve=extend_schema(
         operation_id='api_products_by_category_list',
         summary='Получить список товаров категории c ключом id',
-        description=' '
-    )
+        description=' ',
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductSerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_404_NOT_FOUND, 'application/json'): DetailMessageSerializer,
+        }
+    ),
+
 )
 class ApiProductsViewSet(ReadOnlyModelViewSet):
 
@@ -91,6 +103,7 @@ class ApiProductsViewSet(ReadOnlyModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 @extend_schema(tags=['Product Categories'])
