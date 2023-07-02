@@ -85,7 +85,7 @@ class ProductListView(CommonMixin, ListView):
                 name='category',
                 location=OpenApiParameter.QUERY,
                 required=False,
-                description='Фильтрация товаров по id категории',
+                description='id категории',
                 type=int
             ),
         ]
@@ -94,6 +94,15 @@ class ProductListView(CommonMixin, ListView):
         operation_id='api_products_by_category_list',
         summary='Получить товар по id',
         description=' ',
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description='id товара'
+            )
+        ],
         responses={
             (status.HTTP_200_OK, 'application/json'): ProductSerializer,
             (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
@@ -114,6 +123,15 @@ class ProductListView(CommonMixin, ListView):
         operation_id='api_products_destroy',
         summary='Удалить товар',
         description=' ',
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description='id товара, который необходимо удалить'
+            )
+        ],
         responses={
             status.HTTP_204_NO_CONTENT: None,
             (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
