@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class UserPermission(BasePermission):
+class ApiUserPermission(BasePermission):
 
     """Расширяет возможности класса BasePermissions
 

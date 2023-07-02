@@ -6,14 +6,13 @@ from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import CreateAPIView
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 
 from common.views import CommonMixin
 
 from .models import Buscet, Product, ProductCategory
-from .permissions import UserPermission
+from common.permissions import ApiUserPermission
 from .serializers import ProductCategorySerializer, ProductSerializer, DetailMessageSerializer
 
 
@@ -93,12 +92,22 @@ class ProductListView(CommonMixin, ListView):
     create=extend_schema(
         operation_id='api_products_create',
         summary='Добавить товар',
-        description=' '
+        description=' ',
+        responses={
+            (status.HTTP_201_CREATED, 'application/json'): ProductSerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
     ),
     destroy=extend_schema(
         operation_id='api_products_destroy',
         summary='Удалить товар',
-        description=' '
+        description=' ',
+        responses={
+            status.HTTP_204_NO_CONTENT: None,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
     )
 
 )
@@ -114,7 +123,7 @@ class ApiProductsViewSet(ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = (UserPermission,)
+    permission_classes = (ApiUserPermission,)
     http_method_names = ['get', 'post', 'delete']
 
 
