@@ -4,17 +4,18 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from rest_framework.viewsets import ModelViewSet
+from drf_spectacular.utils import (OpenApiParameter, extend_schema,
+                                   extend_schema_view)
 from rest_framework import status
+from rest_framework.viewsets import ModelViewSet
 
+from common.permissions import ApiUserPermission
 from common.views import CommonMixin
 
 from .models import Buscet, Product, ProductCategory
-from common.permissions import ApiUserPermission
-from .serializers import ProductCategorySerializer, ProductSerializer, DetailMessageSerializer
+from .serializers import (DetailMessageSerializer, ProductCategorySerializer,
+                          ProductSerializer)
 
 
 class IndexView(CommonMixin, TemplateView):

@@ -1,8 +1,8 @@
-from django.urls import path, include
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework.routers import DefaultRouter
 
 from products.views import APIProductCategoryViewSet, ApiProductsViewSet
-from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('products', ApiProductsViewSet)
