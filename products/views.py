@@ -142,12 +142,57 @@ class ApiProductsViewSet(ModelViewSet):
 
 @extend_schema(tags=['Product Categories'])
 @extend_schema_view(
-    post=extend_schema(
+    list=extend_schema(
+        operation_id='api_products_category_list',
+        summary='Получить список категорий',
+        description=' ',
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductCategorySerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+        },
+    ),
+    retrieve=extend_schema(
+        operation_id='api_catgory_by_id',
+        summary='Получить категорию по id',
+        description=' ',
+        parameters=[
+          OpenApiParameter(
+              name='id',
+              type=int,
+              location=OpenApiParameter.PATH,
+              required=True,
+              description='Получить описание категории товара по id'
+          )
+        ],
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductCategorySerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_404_NOT_FOUND, 'application/json'): DetailMessageSerializer,
+        }
+    ),
+    create=extend_schema(
+        operation_id='api_category_create',
         summary='Добавить категорию товара',
-        description=' '
+        description=' ',
+        responses={
+            (status.HTTP_201_CREATED, 'application/json'): ProductCategorySerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
+    ),
+    destroy=extend_schema(
+        operation_id='api_category_destroy',
+        summary='Удалить категорию товара',
+        description=' ',
+        responses={
+            status.HTTP_204_NO_CONTENT: None,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
     )
+
 )
-class APIProductCategoryAddView(CreateAPIView):
+class APIProductCategoryViewSet(ModelViewSet):
 
     """Создает ресурс-категория товара
 
@@ -155,8 +200,10 @@ class APIProductCategoryAddView(CreateAPIView):
         1. serializer_class - ссылка на класс сериализатора
 
     """
-
+    queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
+    permission_classes = (ApiUserPermission,)
+    http_method_names = ['get', 'post', 'delete']
 
 
 @login_required
