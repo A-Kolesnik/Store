@@ -1,15 +1,21 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest, HttpResponseRedirect
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from rest_framework.generics import CreateAPIView, ListAPIView
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import (OpenApiParameter, extend_schema,
+                                   extend_schema_view)
+from rest_framework import status
+from rest_framework.viewsets import ModelViewSet
 
+from common.permissions import ApiUserPermission
 from common.views import CommonMixin
 
 from .models import Buscet, Product, ProductCategory
-from .serializers import ProductCategorySerializer, ProductSerializer
+from .serializers import (DetailMessageSerializer, ProductCategorySerializer,
+                          ProductSerializer)
 
 
 class IndexView(CommonMixin, TemplateView):
@@ -64,9 +70,79 @@ class ProductListView(CommonMixin, ListView):
         return context
 
 
-class APIProductsListView(ListAPIView):
+@extend_schema(tags=['Products'])
+@extend_schema_view(
+    list=extend_schema(
+        operation_id='api_products_list',
+        summary='Получить список товаров',
+        description=' ',
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductSerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+        },
+        parameters=[
+            OpenApiParameter(
+                name='category',
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description='id категории',
+                type=int
+            ),
+        ]
+    ),
+    retrieve=extend_schema(
+        operation_id='api_products_by_category_list',
+        summary='Получить товар по id',
+        description=' ',
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description='id товара'
+            )
+        ],
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductSerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_404_NOT_FOUND, 'application/json'): DetailMessageSerializer,
+        }
+    ),
+    create=extend_schema(
+        operation_id='api_products_create',
+        summary='Добавить товар',
+        description=' ',
+        responses={
+            (status.HTTP_201_CREATED, 'application/json'): ProductSerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
+    ),
+    destroy=extend_schema(
+        operation_id='api_products_destroy',
+        summary='Удалить товар',
+        description=' ',
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description='id товара, который необходимо удалить'
+            )
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: None,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
+    )
 
-    """Возвращает ресурс-перечень товаров
+)
+class ApiProductsViewSet(ModelViewSet):
+
+    """Возвращает ресурс-перечень товаров или ресурс-перечень товаров отдельной категории
 
     Переопределены атрибуты:
         1. queryset - набор записей
@@ -76,43 +152,74 @@ class APIProductsListView(ListAPIView):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = (ApiUserPermission,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('category',)
+    http_method_names = ['get', 'post', 'delete']
 
 
-class APIProductsByCategoryView(ListAPIView):
+@extend_schema(tags=['Product Categories'])
+@extend_schema_view(
+    list=extend_schema(
+        operation_id='api_products_category_list',
+        summary='Получить список категорий',
+        description=' ',
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductCategorySerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+        },
+    ),
+    retrieve=extend_schema(
+        operation_id='api_catgory_by_id',
+        summary='Получить категорию по id',
+        description=' ',
+        parameters=[
+          OpenApiParameter(
+              name='id',
+              type=int,
+              location=OpenApiParameter.PATH,
+              required=True,
+              description='id категории товара'
+          )
+        ],
+        responses={
+            (status.HTTP_200_OK, 'application/json'): ProductCategorySerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_404_NOT_FOUND, 'application/json'): DetailMessageSerializer,
+        }
+    ),
+    create=extend_schema(
+        operation_id='api_category_create',
+        summary='Добавить категорию товара',
+        description=' ',
+        responses={
+            (status.HTTP_201_CREATED, 'application/json'): ProductCategorySerializer,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
+    ),
+    destroy=extend_schema(
+        operation_id='api_category_destroy',
+        summary='Удалить категорию товара',
+        description=' ',
+        parameters=[
+          OpenApiParameter(
+              name='id',
+              type=int,
+              location=OpenApiParameter.PATH,
+              required=True,
+              description='id категории товара, которую необходимо удалить'
+          )
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: None,
+            (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
+            (status.HTTP_403_FORBIDDEN, 'application/json'): DetailMessageSerializer
+        }
+    )
 
-    """Возвращает ресурс-перечень товаров запрашиваемой по id категории
-
-     Переопределены атрибуты:
-         1. serializer_class - ссылка на класс-сериализатор
-     Переопределены методы:
-         1. get_queryset()
-     """
-
-    serializer_class = ProductSerializer
-    lookup_category_id = 'categoryID'
-
-    def get_queryset(self):
-        """Извлекает и возвращает товары запрашиваемой категории
-
-        Категория передается в URL-параметре 'categoryID' в виде ее primary_key 'id'
-
-        """
-        queryset = Product.objects.select_related(
-            'category'
-        ).filter(
-            category__id=self.kwargs[self.lookup_category_id]
-        ).values(
-            'name',
-            'description',
-            'price',
-            'quantity',
-        )
-        Product.objects.select_related(None)
-
-        return queryset
-
-
-class APIProductCategoryAddView(CreateAPIView):
+)
+class APIProductCategoryViewSet(ModelViewSet):
 
     """Создает ресурс-категория товара
 
@@ -120,8 +227,10 @@ class APIProductCategoryAddView(CreateAPIView):
         1. serializer_class - ссылка на класс сериализатора
 
     """
-
+    queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
+    permission_classes = (ApiUserPermission,)
+    http_method_names = ['get', 'post', 'delete']
 
 
 @login_required

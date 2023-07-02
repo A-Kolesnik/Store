@@ -45,4 +45,3 @@ class IndexViewTestCase(TestCase, TestViewsMixin):
     def test_title(self):
         """Тест содержимого заголовка"""
         super(IndexViewTestCase, self).run_test_title()
-
