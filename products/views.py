@@ -6,13 +6,14 @@ from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import CreateAPIView
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from common.views import CommonMixin
 
 from .models import Buscet, Product, ProductCategory
+from .permissions import UserPermission
 from .serializers import ProductCategorySerializer, ProductSerializer, DetailMessageSerializer
 
 
@@ -89,9 +90,19 @@ class ProductListView(CommonMixin, ListView):
             (status.HTTP_404_NOT_FOUND, 'application/json'): DetailMessageSerializer,
         }
     ),
+    create=extend_schema(
+        operation_id='api_products_create',
+        summary='Добавить товар',
+        description=' '
+    ),
+    destroy=extend_schema(
+        operation_id='api_products_destroy',
+        summary='Удалить товар',
+        description=' '
+    )
 
 )
-class ApiProductsViewSet(ReadOnlyModelViewSet):
+class ApiProductsViewSet(ModelViewSet):
 
     """Возвращает ресурс-перечень товаров или ресурс-перечень товаров отдельной категории
 
@@ -103,7 +114,8 @@ class ApiProductsViewSet(ReadOnlyModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (UserPermission,)
+    http_method_names = ['get', 'post', 'delete']
 
 
 @extend_schema(tags=['Product Categories'])
