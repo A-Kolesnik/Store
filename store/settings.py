@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django_cleanup',
     'drf_spectacular',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

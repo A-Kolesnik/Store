@@ -4,7 +4,9 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from drf_spectacular.utils import extend_schema, extend_schema_view
+
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework.generics import CreateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
@@ -77,11 +79,20 @@ class ProductListView(CommonMixin, ListView):
         responses={
             (status.HTTP_200_OK, 'application/json'): ProductSerializer,
             (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
-        }
+        },
+        parameters=[
+            OpenApiParameter(
+                name='category',
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description='Фильтрация товаров по id категории',
+                type=int
+            ),
+        ]
     ),
     retrieve=extend_schema(
         operation_id='api_products_by_category_list',
-        summary='Получить список товаров категории c ключом id',
+        summary='Получить товар по id',
         description=' ',
         responses={
             (status.HTTP_200_OK, 'application/json'): ProductSerializer,
@@ -124,6 +135,8 @@ class ApiProductsViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = (ApiUserPermission,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('category',)
     http_method_names = ['get', 'post', 'delete']
 
 
