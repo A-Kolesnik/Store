@@ -161,7 +161,7 @@ class ApiProductsViewSet(ModelViewSet):
               type=int,
               location=OpenApiParameter.PATH,
               required=True,
-              description='Получить описание категории товара по id'
+              description='id категории товара'
           )
         ],
         responses={
@@ -184,6 +184,15 @@ class ApiProductsViewSet(ModelViewSet):
         operation_id='api_category_destroy',
         summary='Удалить категорию товара',
         description=' ',
+        parameters=[
+          OpenApiParameter(
+              name='id',
+              type=int,
+              location=OpenApiParameter.PATH,
+              required=True,
+              description='id категории товара, которую необходимо удалить'
+          )
+        ],
         responses={
             status.HTTP_204_NO_CONTENT: None,
             (status.HTTP_401_UNAUTHORIZED, 'application/json'): DetailMessageSerializer,
